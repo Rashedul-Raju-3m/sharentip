@@ -2,278 +2,281 @@
 
 namespace App\Http\Controllers;
 
-use DataTables;
 use App\Models\User;
-use App\Models\Product;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Event;
+use App\Models\Ticket;
+use App\Models\AppUser;
+use App\Models\Order;
+use App\Models\Setting;
+use Carbon\Carbon;
+use Redirect;
+use App;
+use App\Models\Language;
+use Rave;
+use Auth;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use DB;
+use Illuminate\Http\Request;
 
-class UserController extends Controller {
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct() {
-        date_default_timezone_set(get_option('timezone', 'Asia/Dhaka'));
+class UserController extends Controller
+{
+    public function index()
+    {                    
+        abort_if(Gate::denies('user_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $users = User::with(['roles:id,name'])->get();
+        return view('admin.user.index', compact('users')); 
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index() {
-        $assets = ['datatable'];
-        return view('backend.admin.user.list', compact('assets'));
+    public function create()
+    {
+        abort_if(Gate::denies('user_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $roles = Role::whereNotIn('name', ['admin'])->get();
+        $orgs = User::role('organization')->orderBy('id','DESC')->get();  
+        return view('admin.user.create', compact('roles','orgs'));
     }
-
-    public function get_table_data() {
-        $users = User::where('user_type', 'user')
-            ->with('package');
-
-        return Datatables::eloquent($users)
-            ->editColumn('name', function ($user) {
-                return '<div class="d-flex align-items-center">'
-                . '<img src="' . profile_picture($user->profile_picture) . '" class="thumb-sm img-thumbnail rounded-circle mr-3">'
-                . '<div><span class="d-block text-height-0"><b>' . $user->name . '</b></span><span class="d-block">' . $user->email . '</span></div>'
-                    . '</div>';
-            })
-            ->filterColumn('name', function ($query, $keyword) {
-                return $query->where("name", "like", "{$keyword}%")
-                    ->orWhere("email", "like", "{$keyword}%");
-            }, true)
-            ->editColumn('package.name', function ($user) {
-                return $user->package->name != null ? $user->package->name . ' (' . ucwords($user->package->package_type) . ')' : '';
-            })
-            ->editColumn('membership_type', function ($user) {
-                if ($user->membership_type == 'member') {
-                    return show_status(ucwords($user->membership_type), 'success');
-                } else {
-                    return show_status(ucwords($user->membership_type), 'danger');
-                }
-            })
-            ->editColumn('status', function ($user) {
-                return status($user->status);
-            })
-            ->addColumn('action', function ($user) {
-                return '<div class="dropdown text-center">'
-                . '<button class="btn btn-outline-primary btn-xs dropdown-toggle" type="button" data-toggle="dropdown">' . _lang('Action') . '</button>'
-                . '<div class="dropdown-menu">'
-                . '<a class="dropdown-item" href="' . route('users.edit', $user['id']) . '"><i class="ti-pencil-alt"></i> ' . _lang('Edit') . '</a>'
-                . '<a class="dropdown-item" href="' . route('users.show', $user['id']) . '"><i class="ti-eye"></i>  ' . _lang('View') . '</a>'
-                . '<a class="dropdown-item" href="' . route('users.login_as_user', $user->id) . '"><i class="ti-user"></i>  ' . _lang('Login as User') . '</a>'
-                . '<form action="' . route('users.destroy', $user['id']) . '" method="post">'
-                . csrf_field()
-                . '<input name="_method" type="hidden" value="DELETE">'
-                . '<button class="dropdown-item btn-remove" type="submit"><i class="ti-trash"></i> ' . _lang('Delete') . '</button>'
-                    . '</form>'
-                    . '</div>'
-                    . '</div>';
-            })
-            ->setRowId(function ($user) {
-                return "row_" . $user->id;
-            })
-            ->rawColumns(['name', 'membership_type', 'status', 'valid_to', 'action'])
-            ->make(true);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request) {
-        $alert_col = 'col-lg-10 offset-lg-1';
-        return view('backend.admin.user.create', compact('alert_col'));
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'name'            => 'required|max:60',
-            'email'           => 'required|email|unique:users|max:191',
-            'status'          => 'required',
-            'profile_picture' => 'nullable|image',
-            'password'        => 'required|min:6',
-            'membership_type' => 'required',
-            'package_id'      => 'required',
+   
+    public function store(Request $request)
+    {
+        $request->validate([
+            'first_name' => 'bail|required',
+            'last_name' => 'bail|required',
+            'email' => 'bail|required|email|unique:users',
+            'phone' => 'bail|required',
+            'password' => 'bail|required|min:6',
         ]);
-
-        if ($validator->fails()) {
-            if ($request->ajax()) {
-                return response()->json(['result' => 'error', 'message' => $validator->errors()->all()]);
-            } else {
-                return redirect()->route('users.create')
-                    ->withErrors($validator)
-                    ->withInput();
-            }
-        }
-
-        $profile_picture = "default.png";
-        if ($request->hasfile('profile_picture')) {
-            $file            = $request->file('profile_picture');
-            $profile_picture = rand() . time() . $file->getClientOriginalName();
-            $file->move(public_path() . "/uploads/profile/", $profile_picture);
-        }
-
-        $user                    = new User();
-        $user->name              = $request->input('name');
-        $user->email             = $request->input('email');
-        $user->user_type         = 'user';
-        $user->membership_type   = $request->input('membership_type');
-        $user->package_id        = $request->input('package_id');
-        $user->subscription_date = now();
-        $user->valid_to          = update_membership_date($user->package, $user->subscription_date);
-        $user->status            = $request->input('status');
-        $user->profile_picture   = $profile_picture;
-        $user->password          = Hash::make($request->password);
-        $user->phone             = $request->input('phone');
-        $user->city              = $request->input('city');
-        $user->state             = $request->input('state');
-        $user->zip               = $request->input('zip');
-        $user->address           = $request->input('address');
-
-        $user->save();
-
-        if ($user->id > 0) {
-            return redirect()->route('users.create')->with('success', _lang('Saved Sucessfully'));
-        } else {
-            return redirect()->route('users.create')->with('error', _lang('Error Occured. Please try again'));
-        }
-
+        $data = $request->all();
+        $data['password'] =  Hash::make($request->password); 
+        $data['org_id'] = $request->organization;
+        $data['language'] = Setting::first()->language;
+        $user = User::create($data);
+        $user->assignRole($request->input('roles', []));
+    
+        return redirect()->route('users.index')->withStatus(__('User is added successfully.'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Request $request, $id) {
-        $user = User::find($id);
-        return view('backend.admin.user.view', compact('user', 'id'));
+    public function show(User $user)
+    {
+        return view('admin.user.show', compact('user'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Request $request, $id) {
-        $alert_col = 'col-lg-10 offset-lg-1';
-        $user      = User::find($id);
-        return view('backend.admin.user.edit', compact('user', 'id', 'alert_col'));
-    }
+    public function edit(User $user)
+    {
+        abort_if(Gate::denies('user_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $roles = Role::all();
+        $roles = Role::whereNotIn('name', ['admin'])->get();
+        if($user->hasRole('admin')){
+            return redirect()->route('users.index')->withStatus(__('You can not edit admin.'));
+        }
+        $orgs = User::role('organization')->orderBy('id','DESC')->get();  
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id) {
-        $validator = Validator::make($request->all(), [
-            'name'            => 'required|max:191',
-            'email'           => [
-                'required',
-                'email',
-                Rule::unique('users')->ignore($id),
-            ],
-            'status'          => 'required',
-            'profile_picture' => 'nullable|image',
-            'password'        => 'nullable|min:6',
-            'membership_type' => 'nullable',
-            'package_id'      => 'nullable',
-            'valid_to'        => 'required',
+        return view('admin.user.edit', compact('roles', 'user','orgs'));
+    }
+   
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'first_name' => 'bail|required',
+            'last_name' => 'bail|required',
+            'phone' => 'bail|required',
+            'email' => 'bail|required|unique:users,email,' . $user->id . ',id',
         ]);
+        $data = $request->all();
+        $data['org_id'] = $request->organization;
+        $user->update($data);        
+        $user->syncRoles($request->input('roles', []));
 
-        if ($validator->fails()) {
-            if ($request->ajax()) {
-                return response()->json(['result' => 'error', 'message' => $validator->errors()->all()]);
-            } else {
-                return redirect()->route('users.edit', $id)
-                    ->withErrors($validator)
-                    ->withInput();
-            }
-        }
+        return redirect()->route('users.index')->withStatus(__('User is updated successfully.'));
+    }
 
-        if ($request->hasfile('profile_picture')) {
-            $file            = $request->file('profile_picture');
-            $profile_picture = time() . $file->getClientOriginalName();
-            $file->move(public_path() . "/uploads/profile/", $profile_picture);
-        }
-
-        $user                  = User::find($id);
-        $user->name            = $request->input('name');
-        $user->email           = $request->input('email');
-        $user->membership_type = $request->input('membership_type');
-        $user->package_id      = $request->input('package_id');
-        $user->status          = $request->input('status');
-        $user->valid_to        = $request->input('valid_to');
-
-        if ($request->hasfile('profile_picture')) {
-            $user->profile_picture = $profile_picture;
-        }
-
-        if ($request->password) {
-            $user->password = Hash::make($request->password);
-        }
-
-        $user->phone   = $request->input('phone');
-        $user->city    = $request->input('city');
-        $user->state   = $request->input('state');
-        $user->zip     = $request->input('zip');
-        $user->address = $request->input('address');
-
-        $user->save();
-
-        return redirect()->route('users.index')->with('success', _lang('Updated Sucessfully'));
+    public function destroy(User $user)
+    {
 
     }
 
-    public function login_as_user($id) {
-        $user = User::find($id);
-        session(['login_as_user' => true, 'admin' => auth()->user()]);
-        Auth::login($user);
-        return redirect()->route('dashboard.index');
-    }
-
-    public function back_to_admin() {
-        if (session('login_as_user') == true && session('admin') != null) {
-            Auth::login(session('admin'));
-            session(['login_as_user' => null, 'admin' => null]);
-            return redirect()->route('dashboard.index');
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id) {
-        DB::beginTransaction();
-
-        $user = User::find($id);
-        Product::where('user_id', $id)->delete();
-        $user->delete();
+    public function adminDashboard(){  
         
-        DB::commit();
-        return redirect()->route('users.index')->with('success', _lang('Deleted Sucessfully'));
+        $master['organizations'] = User::role('organization')->count();
+        $master['users'] = AppUser::count();
+        $master['total_order'] = Order::count();
+        $master['pending_order'] = Order::where('order_status','Pending')->count();
+        $master['complete_order'] = Order::where('order_status','Complete')->count();
+        $master['cancel_order'] = Order::where('order_status','Cancel')->count();
+        $master['eventDate'] = array();
+        $events = Event::where([['status',1],['is_deleted',0]])->orderBy('id','DESC')->get();              
+        $day = Carbon::parse(Carbon::now()->year.'-'.Carbon::now()->month.'-01')->daysInMonth;                       
+        $monthEvent = Event::whereBetween('start_time', [ date('Y')."-".date('m')."-01 00:00:00",  date('Y')."-".date('m')."-".$day." 23:59:59"])
+        ->where([['status',1],['is_deleted',0]])
+        ->orderBy('id','DESC')->get();
+      
+        foreach ($monthEvent as $value) {
+            $value->tickets = Ticket::where('event_id',$value->id)->sum('quantity');
+            $value->sold_ticket = Order::where('event_id',$value->id)->sum('quantity');         
+            $value->average = $value->tickets==0? 0: $value->sold_ticket*100/$value->tickets;           
+        }
+        foreach ($events as $value) {
+            $tickets = Ticket::where('event_id',$value->id)->sum('quantity');
+            $sold_ticket = Order::where('event_id',$value->id)->sum('quantity'); 
+            $value->avaliable = $tickets - $sold_ticket;
+            array_push( $master['eventDate'],$value->start_time->format('Y-m-d'));
+        }
+    
+        return view('admin.dashboard', compact('events','monthEvent','master'));
+    }
+
+
+    public function organizationDashboard(){        
+        $master['total_tickets'] = Ticket::where('user_id',Auth::user()->id)->sum('quantity');
+        $master['used_tickets'] = Order::where('organization_id',Auth::user()->id)->sum('quantity');
+        $master['events'] = Event::where([['user_id',Auth::user()->id],['is_deleted',0]])->count();
+        $master['total_order'] = Order::where('organization_id',Auth::user()->id)->count();
+        $master['pending_order'] = Order::where([['order_status','Pending'],['organization_id',Auth::user()->id]])->count();
+        $master['complete_order'] = Order::where([['order_status','Complete'],['organization_id',Auth::user()->id]])->count();
+        $master['cancel_order'] = Order::where([['order_status','Cancel'],['organization_id',Auth::user()->id]])->count();
+        $day = Carbon::parse(Carbon::now()->year.'-'.Carbon::now()->month.'-01')->daysInMonth; 
+        $monthEvent = Event::whereBetween('start_time', [ date('Y')."-".date('m')."-01 00:00:00",  date('Y')."-".date('m')."-".$day." 23:59:59"])
+        ->where([['status',1],['user_id',Auth::user()->id],['is_deleted',0]])
+        ->orderBy('id','DESC')->get();      
+
+        foreach ($monthEvent as $value) {
+            $value->tickets = Ticket::where('event_id',$value->id)->sum('quantity');
+            $value->sold_ticket = Order::where('event_id',$value->id)->sum('quantity');         
+            $value->average = $value->tickets==0? 0: $value->sold_ticket*100/$value->tickets;           
+        }
+
+        $events = Event::where([['status',1],['user_id',Auth::user()->id],['is_deleted',0]])->orderBy('id','DESC')->get(); 
+        $master['eventDate'] = array();
+        foreach ($events as $value) {
+            $tickets = Ticket::where('event_id',$value->id)->sum('quantity');
+            $sold_ticket = Order::where('event_id',$value->id)->sum('quantity'); 
+            $value->avaliable = $tickets - $sold_ticket;
+            array_push( $master['eventDate'],$value->start_time->format('Y-m-d'));
+        }
+    
+        return view('admin.org_dashboard', compact('events','monthEvent','master'));
+    }
+
+    public function viewProfile(){
+        $languages = Language::where('status',1)->get();
+        return view('admin.profile', compact('languages'));
+    }
+
+    public function editProfile(Request $request){
+        User::find(Auth::user()->id)->update($request->all());
+        if(session()->get('locale') != $request->language) {
+            App::setLocale($request->language);
+            session()->put('locale', $request->language);
+            $direction = Language::where('name',$request->language)->first()->direction;
+            session()->put('direction', $direction);
+        }
+        return redirect('profile')->withStatus(__('Profile is updated successfully.'));
+    }
+
+    public function changePassword(Request $request){
+        $request->validate([
+            'current_password' => 'bail|required',
+            'password' => 'bail|required|min:6',
+            'confirm_password' => 'bail|required|same:password|min:6'
+        ]);
+
+        if (Hash::check($request->current_password, Auth::user()->password)){
+            User::find(Auth::user()->id)->update(['password'=>Hash::make($request->password)]);
+            return redirect('profile')->withStatus(__('Password is updated successfully.'));          
+        }
+        else{
+            return Redirect::back()->with('error_msg','Current Password is wrong!');
+        }
+    }
+
+    public function makePayment($id){
+        $order = Order::with(['customer'])->find($id);
+        return view('createPayment', compact('order'));
+    }
+
+    public function transction_verify(Request $request, $order_id)
+    {
+        $order = Order::find($order_id);
+        $id = $request->input('transaction_id');
+        if ($request->input('status') == 'successful') {
+            $order->payment_token = $id;
+            $order->payment_status = 1;
+            $order->save();
+            return view('transction_verify');
+        } else {
+            return view('cancel');
+        }
+    }
+
+    public function initialize(Request $request,$id)
+    {
+      Rave::initialize(route('callback',$id));
+    }
+
+    public function callback(Request $request,$id)
+    {
+        $payment_token = json_decode($request->resp)->tx->paymentId;
+        $order = Order::find($id)->update(['payment_status'=>1,'payment_token'=> $payment_token]);
+        return view('createPayment');
+    }
+
+    public function changeLanguage($lang)
+    {
+        App::setLocale($lang);
+        session()->put('locale', $lang);
+        $dir = Language::where('name',$lang)->first()->direction;
+        session()->put('direction', $dir);
+        return redirect()->back();
+    }
+
+    public function scanner(){
+        if(Auth::user()->hasRole('admin'))
+        {
+            $scanners = User::role('scanner')->orderBy('id','DESC')->get();
+        }
+        else{
+            $scanners = User::role('scanner')->where('org_id',Auth::user()->id)->orderBy('id','DESC')->get();
+        }   
+        foreach ($scanners as $value) {
+            $value->total_event = Event::where('scanner_id',$value->id)->count();
+        }             
+        return view('admin.scanner.index',compact('scanners'));
+    }
+    
+    public function scannerCreate(){
+        return view('admin.scanner.create');
+    }
+
+    public function addScanner(Request $request){
+      
+        $request->validate([
+            'first_name' => 'bail|required',
+            'last_name' => 'bail|required',
+            'email' => 'bail|required|email|unique:users',
+            'phone' => 'bail|required',
+            'password' => 'bail|required|min:6',
+        ]);
+        $data = $request->all();
+        $data['org_id'] = Auth::user()->id;
+        $data['password'] =  Hash::make($request->password); 
+       
+        $data['language'] = Setting::first()->language;
+        $user = User::create($data);           
+        $user->assignRole('scanner');
+        return redirect('scanner')->withStatus(__('Scanner is added successfully.'));
+    }
+
+    public function blockScanner($id){
+        $user = User::find($id);  
+        $user->status = $user->status == "1" ? "0" : "1";
+        $user->save();        
+        return redirect('scanner')->withStatus(__('User status changed successfully.'));
+    }
+
+    public function getScanner($id){
+        $data = User::where('org_id',$id)->orderBy('id','DESC')->get();
+        return response()->json(['data' => $data,'success'=>true], 200); 
     }
 }

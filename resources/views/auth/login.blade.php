@@ -1,109 +1,70 @@
-@extends('layouts.auth')
+@extends('master')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card card-signin p-3 my-5">
-                <div class="card-body">
-					<img class="logo" src="{{ get_logo() }}">
-					
-					<h5 class="text-center py-4">{{ _lang('Login To Your Account') }}</h4> 
-					
-                    @if(Session::has('error'))
-                        <div class="alert alert-danger text-center">
-                            <strong>{{ session('error') }}</strong>
-                        </div>
-                    @endif
-					
-					@if(Session::has('registration_success'))
-                        <div class="alert alert-success text-center">
-                            <strong>{{ session('registration_success') }}</strong>
-                        </div>
-                    @endif
 
-					<form method="POST" class="form-signin" action="{{ route('login') }}">
-                        @csrf
+  <section class="section">
+      <div class="d-flex flex-wrap align-items-stretch">
+        <div class="col-lg-4 col-md-6 col-12 order-lg-1 min-vh-100 order-2 bg-white">
+          <div class="p-4 m-3">
+          <img src="{{ url('images/upload/'.\App\Models\Setting::find(1)->logo)}}" alt="logo" width="80" class="login-logo mb-4 mt-2">
+            <h4 class="text-dark font-weight-normal mb-4">{{__('Welcome to ')}}<span class="font-weight-bold">{{\App\Models\Setting::find(1)->app_name}}</span></h4>
+            <form method="POST" action="{{url('admin/login')}}" class="needs-validation" novalidate="">
+                @csrf
+              <div class="form-group">
+                <label for="email">{{__('Email')}}</label>
+                <input id="email" type="email" class="form-control" name="email" tabindex="1" required autofocus>
+                @if ($errors->has('email'))
+                    <div class="invalid-feedback">
+                        <strong>{{ $errors->first('email') }}</strong>
+                    </div>
+                @endif
+                @if(Session::has('error_msg'))
+                    <span class="invalid-feedback" style="display: block;">
+                        <strong>{{Session::get('error_msg')}}</strong>
+                    </span>
+                @endif
+              </div>
 
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" placeholder="{{ _lang('Email') }}" required autofocus>
-
-                                @if ($errors->has('email'))
-                                    <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-						    <div class="col-md-12">	
-
-								<input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" placeholder="{{ _lang('Password') }}" required>
-
-                                @if ($errors->has('password'))
-                                    <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <input type="hidden" name="g-recaptcha-response" id="recaptcha">
-                                @if ($errors->has('g-recaptcha-response'))
-                                    <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-						
-						<div class="text-center">
-							<div class="custom-control custom-checkbox mb-3">
-								<input type="checkbox" name="remember" class="custom-control-input" id="remember" {{ old('remember') ? 'checked' : '' }}>
-								<label class="custom-control-label" for="remember">{{ _lang('Remember Me') }}</label>
-							</div>
-						</div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary btn-block">
-                                    {{ _lang('Login') }}
-                                </button>
-
-                                @if(get_option('member_signup') == 1)
-                                    <a href="{{ route('register') }}" class="btn btn-link btn-register">{{ _lang('Create Account') }}</a>
-								@endif							
-                            </div>
-                        </div>
-						
-						
-						<div class="form-group row mt-3">
-                            <div class="col-md-12">
-								<a class="btn-link" href="{{ route('password.request') }}">
-									{{ _lang('Forgot Password?') }}
-								</a>
-							</div>
-                        </div>
-                    </form>
+              <div class="form-group">
+                <div class="d-block">
+                  <label for="password" class="control-label">{{__('Password')}}</label>
                 </div>
-            </div>
+                <input id="password" type="password" class="form-control" name="password" tabindex="2" required>
+                @if ($errors->has('password'))
+                    <div class="invalid-feedback">
+                        <strong>{{ $errors->first('password') }}</strong>
+                    </div>
+                @endif
+              </div>
+
+              <div class="form-group">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox"  name="remember" class="custom-control-input" tabindex="3" id="remember-me">
+                  <label class="custom-control-label" for="remember-me">{{__('Remember Me')}}</label>
+                </div>
+              </div>
+
+              <div class="form-group text-right">
+                <button type="submit" class="btn btn-primary btn-lg btn-icon icon-right" tabindex="4">
+                  {{__('Login')}}
+                </button>
+              </div>
+                <a href="{{ url('google/redirect') }}">Login with Google</a>
+
+            </form>
+          </div>
         </div>
-    </div>
-</div>
-@if(get_option('enable_recaptcha', 0) == 1)
-<script src="https://www.google.com/recaptcha/api.js?render={{ get_option('recaptcha_site_key') }}"></script>
-<script>
-    grecaptcha.ready(function() {
-        grecaptcha.execute('{{ get_option('recaptcha_site_key') }}', {action: 'login'}).then(function(token) {
-        if (token) {
-            document.getElementById('recaptcha').value = token;
-        }
-        });
-    });
-</script>
-@endif
+    <div class="col-lg-8 col-12 order-lg-2 order-1 min-vh-100 background-walk-y position-relative overlay-gradient-bottom" data-background="{{url('images/login-bg.jpg')}}">
+          <div class="absolute-bottom-left index-2">
+            <div class="text-light p-5 pb-2">
+              <div class="mb-5 pb-3">
+                <h1 class="mb-2 display-4 font-weight-bold">{{ __('Welcome') }}</h1>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
 @endsection

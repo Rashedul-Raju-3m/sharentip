@@ -9,10 +9,15 @@ class VerifyCsrfToken extends Middleware
     /**
      * The URIs that should be excluded from CSRF verification.
      *
-     * @var array<int, string>
+     * @var array
      */
+   /* protected $except = [
+        //
+        'rave/callback',
+        'saveAdminData',
+        'saveEnvData',
+    ];*/
     protected $except = [
-        'callback/instamojo',
-        'subscription_callback/instamojo',
+        '*'
     ];
 }

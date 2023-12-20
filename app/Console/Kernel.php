@@ -5,8 +5,8 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
-class Kernel extends ConsoleKernel {
-
+class Kernel extends ConsoleKernel
+{
     /**
      * The Artisan commands provided by your application.
      *
@@ -22,17 +22,9 @@ class Kernel extends ConsoleKernel {
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule) {
-        $schedule->call(new \App\Cronjobs\RecurringInvoiceTask)->everyThirtyMinutes();
-        $schedule->call(new \App\Cronjobs\TrialEndedTask)->hourly();
-        $schedule->call(new \App\Cronjobs\SubscriptionReminderTask)->hourlyAt(10);
-        $schedule->call(function () {
-            update_currency_exchange_rate();
-        })->everyTwoHours();
-
-        $schedule->call(function () {
-            update_option("cornjob_runs_at", now());
-        });
+    protected function schedule(Schedule $schedule)
+    {
+        // $schedule->command('inspire')->hourly();
     }
 
     /**
@@ -40,8 +32,9 @@ class Kernel extends ConsoleKernel {
      *
      * @return void
      */
-    protected function commands() {
-        $this->load(__DIR__ . '/Commands');
+    protected function commands()
+    {
+        $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
     }

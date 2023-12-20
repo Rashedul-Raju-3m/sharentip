@@ -1,143 +1,77 @@
-@extends('layouts.auth')
+@extends('layouts.app')
 
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card card-signin my-5 p-3">              
-				<div class="card-body">
-				    <img class="logo" src="{{ get_logo() }}">
-					
-					<h5 class="text-center py-4">{{ _lang('Create Your Account') }}</h4> 
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">{{ __('Register') }}</div>
 
-                    @if(Session::has('error'))
-                        <div class="alert alert-danger">
-                            <span>{{ session('error') }}</span>
-                        </div>
-                    @endif
-
-                    @if(Session::has('success'))
-                        <div class="alert alert-success mb-4">
-                            <span>{{ session('success') }}</span>
-                        </div>
-                    @endif	
-					
-                    <form method="POST" class="form-signup" autocomplete="off" action="{{ route('register') }}">
+                <div class="card-body">
+                    <form method="POST" action="{{ route('register') }}">
                         @csrf
 
                         <div class="form-group row">
-							<div class="col-lg-12">
-                                <input id="name" type="text" placeholder="{{ _lang('Name') }}" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required autofocus>
+                            <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Name') }}</label>
 
-                                @if ($errors->has('name'))
-                                    <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('name') }}</strong>
+                            <div class="col-md-6">
+                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
+
+                                @error('name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
                                     </span>
-                                @endif
-                            </div>
-
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-lg-12">
-                                <input id="email" type="email" placeholder="{{ _lang('E-Mail Address') }}" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required>
-
-                                @if ($errors->has('email'))
-                                    <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-						
-						<div class="form-group row">
-                            <div class="col-lg-6 mb-3 mb-lg-0">
-                                <select class="form-control{{ $errors->has('country_code') ? ' is-invalid' : '' }} select2" name="country_code" required>
-                                    <option value="">{{ _lang('Country Code') }}</option>
-                                    @foreach(get_country_codes() as $key => $value)
-                                    <option value="{{ $value['dial_code'] }}" {{ old('country_code') == $value['dial_code'] ? 'selected' : '' }}>{{ $value['country'].' (+'.$value['dial_code'].')' }}</option>
-                                    @endforeach
-                                </select>
-                                @if ($errors->has('country_code'))
-                                    <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('country_code') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-
-                            <div class="col-lg-6">
-                                <input id="mobile" type="text" placeholder="{{ _lang('Mobile') }}" class="form-control{{ $errors->has('mobile') ? ' is-invalid' : '' }}" name="mobile" value="{{ old('mobile') }}" required>
-
-                                @if ($errors->has('mobile'))
-                                    <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('mobile') }}</strong>
-                                    </span>
-                                @endif
+                                @enderror
                             </div>
                         </div>
 
                         <div class="form-group row">
+                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
 
-                            <div class="col-lg-6 mb-3 mb-lg-0">
-                                <input id="password" type="password" placeholder="{{ _lang('Password') }}" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+                            <div class="col-md-6">
+                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
 
-                                @if ($errors->has('password'))
-                                    <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('password') }}</strong>
+                                @error('email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
                                     </span>
-                                @endif
-                            </div>
-
-                           <div class="col-lg-6">
-                                <input id="password-confirm" type="password" class="form-control" placeholder="{{ _lang('Confirm Password') }}" name="password_confirmation" required>
+                                @enderror
                             </div>
                         </div>
 
                         <div class="form-group row">
-                            <div class="col-lg-12">
-                                <input type="hidden" class="{{ $errors->has('g-recaptcha-response') ? ' is-invalid' : '' }}" name="g-recaptcha-response" id="recaptcha">
-                                @if ($errors->has('g-recaptcha-response'))
-                                    <span class="invalid-feedback">
-                                        <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
+                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+
+                                @error('password')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
                                     </span>
-                                @endif
+                                @enderror
                             </div>
                         </div>
 
-                        @if(request()->package_id)
-                        <input type="hidden" name="package_id" value="{{ request()->package_id }}">
-                        @endif
-						
-						<div class="form-group row mt-4">
-							<div class="col-lg-12 text-center">
-								<button type="submit" class="btn btn-primary btn-login">
-								{{ _lang('Create My Account') }}
+                        <div class="form-group row">
+                            <label for="password-confirm" class="col-md-4 col-form-label text-md-right">{{ __('Confirm Password') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-0">
+                            <div class="col-md-6 offset-md-4">
+                                <button type="submit" class="btn btn-primary">
+                                    {{ __('Register') }}
                                 </button>
-							</div>
-						</div>
-                        <div class="form-group row mt-4">
-							<div class="col-lg-12 text-center">
-							   {{ _lang('Already Have An Account?') }} 
-                               <a href="{{ route('login') }}">{{ _lang('Log In Here') }}</a>
-							</div>
-						</div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@if(get_option('enable_recaptcha', 0) == 1)
-<script src="https://www.google.com/recaptcha/api.js?render={{ get_option('recaptcha_site_key') }}"></script>
-<script>
-    grecaptcha.ready(function() {
-        grecaptcha.execute('{{ get_option('recaptcha_site_key') }}', {action: 'register'}).then(function(token) {
-        if (token) {
-            document.getElementById('recaptcha').value = token;
-        }
-        });
-    });
-</script>
-@endif
 @endsection

@@ -4,145 +4,61 @@ namespace App\Http\Controllers;
 
 use App\Models\Faq;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Gate;
 
-class FaqController extends Controller {
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct() {
-        date_default_timezone_set(get_option('timezone', 'Asia/Dhaka'));
+class FaqController extends Controller
+{
+    public function index()
+    {
+        abort_if(Gate::denies('faq_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+       
+        $faq = Faq::orderBy('id','DESC')->get();              
+        return view('admin.faq.index', compact('faq'));
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index() {
-        $assets = ['datatable'];
-        $faqs = Faq::all()->sortByDesc("id");
-        return view('backend.admin.website_management.faq.list', compact('faqs', 'assets'));
+    public function create()
+    {
+        return view('admin.faq.create');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request) {
-        if (!$request->ajax()) {
-            return back();
-        } else {
-            return view('backend.admin.website_management.faq.modal.create');
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'status'         => 'required',
-            'trans.question' => 'required',
-            'trans.answer'   => 'required',
+    public function store(Request $request)
+    {
+        $request->validate([
+            'question' => 'bail|required',    
+            'answer' => 'bail|required',                       
         ]);
+        $faq = Faq::create($request->all());             
+        return redirect()->route('faq.index')->withStatus(__('Faq is added successfully.'));
+    }
 
-        if ($validator->fails()) {
-            if ($request->ajax()) {
-                return response()->json(['result' => 'error', 'message' => $validator->errors()->all()]);
-            } else {
-                return redirect()->route('faqs.create')
-                    ->withErrors($validator)
-                    ->withInput();
-            }
-        }
-
-        $faq         = new Faq();
-        $faq->status = $request->input('status');
-        $faq->save();
-
-        $faq->question = $faq->translation->question;
-        $faq->status   = status($faq->status);
-
-        if (!$request->ajax()) {
-            return redirect()->route('faqs.create')->with('success', _lang('Saved Successfully'));
-        } else {
-            return response()->json(['result' => 'success', 'action' => 'store', 'message' => _lang('Saved Successfully'), 'data' => $faq, 'table' => '#faqs_table']);
-        }
+    public function show(Faq $faq)
+    {
 
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Request $request, $id) {
-        $faq = Faq::find($id);
-        if (!$request->ajax()) {
-            return back();
-        } else {
-            return view('backend.admin.website_management.faq.modal.edit', compact('faq', 'id'));
-        }
-
+    public function edit(Faq $faq)
+    {
+        return view('admin.faq.edit', compact('faq'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id) {
-        $validator = Validator::make($request->all(), [
-            'status'         => 'required',
-            'trans.question' => 'required',
-            'trans.answer'   => 'required',
+    public function update(Request $request, Faq $faq)
+    {
+        $request->validate([
+            'question' => 'bail|required',    
+            'answer' => 'bail|required',                       
         ]);
-
-        if ($validator->fails()) {
-            if ($request->ajax()) {
-                return response()->json(['result' => 'error', 'message' => $validator->errors()->all()]);
-            } else {
-                return redirect()->route('faqs.edit', $id)
-                    ->withErrors($validator)
-                    ->withInput();
-            }
-        }
-
-        $faq         = Faq::find($id);
-        $faq->status = $request->input('status');
-        $faq->save();
-
-        $faq->question = $faq->translation->question;
-        $faq->status   = status($faq->status);
-
-        if (!$request->ajax()) {
-            return redirect()->route('faqs.index')->with('success', _lang('Updated Successfully'));
-        } else {
-            return response()->json(['result' => 'success', 'action' => 'update', 'message' => _lang('Updated Successfully'), 'data' => $faq, 'table' => '#faqs_table']);
-        }
-
+        $faq = Faq::find($faq->id)->update($request->all());             
+        return redirect()->route('faq.index')->withStatus(__('Faq is updated successfully.'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id) {
-        $faq = Faq::find($id);
-        $faq->delete();
-        return redirect()->route('faqs.index')->with('success', _lang('Deleted Successfully'));
+    public function destroy(Faq $faq)
+    {
+        try{
+            $faq->delete();
+            return true;
+        }catch(Throwable $th){
+            return response('Data is Connected with other Data', 400);
+        }
     }
 }

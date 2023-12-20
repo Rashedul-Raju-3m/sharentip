@@ -2,21 +2,16 @@
 
 namespace App\Models;
 
-use App\Models\Package;
-use App\Models\Business;
-use App\Utilities\Overrider;
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
-class User extends Authenticatable implements MustVerifyEmail {
-    use HasApiTokens, HasFactory, Notifiable;
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable,HasRoles,HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -24,7 +19,19 @@ class User extends Authenticatable implements MustVerifyEmail {
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'phone', 'password', 'user_type', 'status', 'package_id', 'profile_picture',
+        'name',
+        'first_name',
+        'last_name',
+        'email',
+        'password',
+        'status',
+        'phone',
+        'image',
+        'device_token',
+        'org_id',
+        'bio',
+        'country',
+        'language',
     ];
 
     /**
@@ -33,7 +40,8 @@ class User extends Authenticatable implements MustVerifyEmail {
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -44,66 +52,25 @@ class User extends Authenticatable implements MustVerifyEmail {
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    protected $appends = ['followers','imagePath'];
 
-    public function scopeActive($query) {
-        return $query->where('status', 1);
-    }
-
-    public function scopeStaff($query) {
-        return $query->whereHas('business', function (Builder $query) {
-            $query->where('owner_id', auth()->id())
-                ->where('role_id', '!=', null);
-        });
-    }
-
-    public function package() {
-        return $this->belongsTo(Package::class, 'package_id')->withDefault();
-    }
-
-    public function subscriptionPayments() {
-        return $this->hasMany(SubscriptionPayment::class, 'user_id');
-    }
-
-    public function business() {
-        return $this->belongsToMany(Business::class, 'business_users')->withPivot('owner_id', 'is_active', 'role_id');
-    }
-
-    public function roles(): BelongsToMany {
-        return $this->belongsToMany(Role::class, 'business_users', 'user_id', 'role_id')->using(BusinessUser::class);
-    }
-
-    protected function createdAt(): Attribute {
-        $date_format = get_date_format();
-        $time_format = get_time_format();
-
-        return Attribute::make(
-            get:fn($value) => \Carbon\Carbon::parse($value)->format("$date_format $time_format"),
-        );
-    }
-
-    protected function subscriptionDate(): Attribute {
-        $date_format = get_date_format();
-
-        return Attribute::make(
-            get:fn($value) => $value != null ? \Carbon\Carbon::parse($value)->format("$date_format") : null,
-        );
-    }
-
-    protected function validTo(): Attribute {
-        $date_format = get_date_format();
-
-        return Attribute::make(
-            get:fn($value) => $value != null ? \Carbon\Carbon::parse($value)->format("$date_format") : null,
-        );
-    }
-
-    public function sendEmailVerificationNotification()
+    public function getFollowersAttribute()
     {
-        if(get_option('email_verification') == 0) {
-            return;
-        }
-        Overrider::load("Settings");
-        $this->notify(new VerifyEmail);
+        $appuser = AppUser::get();          
+        $followers= array();
+        foreach ($appuser as $user) {                
+            if(in_array($this->attributes['id'],array_filter(explode(',',$user->following)))){
+                array_push($followers,$user->id);
+            } 
+        }  
+        return $followers;      
+    }
+    
+    public function getImagePathAttribute()
+    {
+        return url('images/upload') . '/'.$this->attributes['image'];
     }
 
+    
+ 
 }

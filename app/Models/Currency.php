@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Currency extends Model
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'currency';
+    use HasFactory;
 
-    public function scopeActive($query)
-    {
-        return $query->where('status', 1);
-    }
+    protected $fillable = [
+        'country',
+        'currency',
+        'symbol',
+        'code',
+    ];
+
+    protected $table = 'currency';
 }
