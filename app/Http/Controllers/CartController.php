@@ -436,7 +436,9 @@ class CartController extends Controller
                                 ->get();
 
         if (sizeof($services)>0){
+            $refUser = Session::get('refUser');
             Session::flush();
+            Session::put('refUser', $refUser);
             foreach ($services as $service){
                 $item['item_id'] = $service->item_id;
                 $item['serviceName'] = $service->service_name;
@@ -446,7 +448,6 @@ class CartController extends Controller
                 $item['image'] = $service->image;
                 $item['service_id'] = $id;
                 $item['order_quantity'] = 0;
-//                $item['refer_discount'] = 0;
                 CartHelper::addItem($item);
             }
         }

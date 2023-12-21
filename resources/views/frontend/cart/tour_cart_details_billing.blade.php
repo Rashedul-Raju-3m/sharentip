@@ -145,9 +145,12 @@
                                                         <div class="row">
                                                             <div class="col-lg-12">
                                                                 <div class="_1RLMtIP3 _1w0U-CY6 Qso_pkui mb-4">
-                                                                    <div class="_2iCrTJcD"><label class="_2x_Fz5Ot" data-qa="label-name">Referer Number</label></div>
+                                                                    <div class="_2iCrTJcD"><label class="_2x_Fz5Ot" data-qa="label-name">Referer Number (Mobile Number)</label></div>
+                                                                    @php
+                                                                        $refUser = Session::get('refUser');
+                                                                    @endphp
                                                                     <div class="_2fessCXR p2xx3nlH up-A7EAi">
-                                                                        <input autocomplete="off" class="RJT7RW5k" name="referer_number" type="textarea" value="" placeholder="Enter referer number">
+                                                                        <input autocomplete="off" class="RJT7RW5k" name="referer_number" type="text" value="{{isset($refUser)?$refUser:null}}" placeholder="Enter referer mobile number" maxlength="11" {{isset($refUser)?'readonly':''}}>
                                                                     </div>
                                                                     @error('referer_number')
                                                                     <div class="_2OcwfRx4" data-qa="email-status-message">{{$message}}</div>

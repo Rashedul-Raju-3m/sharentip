@@ -5,6 +5,7 @@ use App\Http\Controllers\FrontendController;
 
 
 Route::get('/', [FrontendController::class, 'home'])->name('home');
+Route::get('/ref/{slug}', [FrontendController::class, 'refHome'])->name('ref_home');
 Route::group(['prefix' => 'user'], function () {
     Route::get('/register', [FrontendController::class, 'register']);
     Route::post('/register', [FrontendController::class, 'userRegister']);

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 18, 2023 at 07:19 PM
+-- Generation Time: Dec 21, 2023 at 08:14 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.1.17
 
@@ -64,7 +64,9 @@ CREATE TABLE `app_user` (
 --
 
 INSERT INTO `app_user` (`id`, `name`, `last_name`, `email`, `remember_token`, `email_verified_at`, `password`, `image`, `address`, `phone`, `following`, `favorite`, `favorite_blog`, `lat`, `lang`, `provider`, `provider_token`, `device_token`, `bio`, `language`, `status`, `created_at`, `updated_at`, `address1`, `address2`, `country`, `division`, `district`, `upazila`) VALUES
-(1, 'User', 'Test', 'user@user.com', NULL, NULL, '$2y$10$24ti88gCBnEhy0R2HVX4necmcoRtdOY7sf7317q8Xs3D4xEG3WNhK', 'defaultuser.png', 'Uttara Dhaka', '01790909090', NULL, NULL, NULL, NULL, NULL, 'LOCAL', NULL, NULL, NULL, 'English', 1, '2023-04-17 18:03:46', '2023-05-06 15:37:40', 'Uttara ', ' Dhaka', 18, 6, 41, 320);
+(1, 'User', 'Test', 'user@user.com', NULL, NULL, '$2y$10$24ti88gCBnEhy0R2HVX4necmcoRtdOY7sf7317q8Xs3D4xEG3WNhK', 'defaultuser.png', 'Uttara Dhaka', '01790909090', NULL, NULL, NULL, NULL, NULL, 'LOCAL', NULL, NULL, NULL, 'English', 1, '2023-04-17 18:03:46', '2023-05-06 15:37:40', 'Uttara ', ' Dhaka', 18, 6, 41, 320),
+(2, 'Anik', 'Anik', 'anik@gmail.com', NULL, NULL, '$2y$10$AP0JRSRAucTwdHcUFSx3SetUb0A89LE/Ujv25a5uifuwKKUXCMQL6', 'defaultuser.png', NULL, '0189898989', NULL, NULL, NULL, NULL, NULL, 'LOCAL', NULL, NULL, NULL, 'English', 1, '2023-12-18 19:06:55', '2023-12-18 19:06:55', NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 'wwerw', 'wewer', 'wewe@gmail.com', NULL, NULL, '$2y$10$F/ltrjsWxUvd26auWP.exOy29t9czsY9OVT6EtDp.3juKhwSVDvMi', 'defaultuser.png', NULL, '243242', NULL, NULL, NULL, NULL, NULL, 'LOCAL', NULL, NULL, NULL, 'English', 1, '2023-12-18 19:08:56', '2023-12-18 19:08:56', NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1143,7 +1145,7 @@ CREATE TABLE `order_billing` (
   `last_name` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `mobile` varchar(50) DEFAULT NULL,
-  `address1` longtext DEFAULT NULL,
+  `address` longtext DEFAULT NULL,
   `address2` longtext DEFAULT NULL,
   `country` int(10) DEFAULT NULL,
   `division` int(10) DEFAULT NULL,
@@ -1157,7 +1159,7 @@ CREATE TABLE `order_billing` (
 -- Dumping data for table `order_billing`
 --
 
-INSERT INTO `order_billing` (`id`, `order_id`, `name`, `last_name`, `email`, `mobile`, `address1`, `address2`, `country`, `division`, `district`, `upazila`, `created_at`, `updated_at`) VALUES
+INSERT INTO `order_billing` (`id`, `order_id`, `name`, `last_name`, `email`, `mobile`, `address`, `address2`, `country`, `division`, `district`, `upazila`, `created_at`, `updated_at`) VALUES
 (27, 60, 'User', 'Test', 'user@user.com', '01790909090', 'Uttara', 'Dhaka', 18, 6, 41, 320, '2023-06-14 14:15:51', '2023-06-14 20:15:51'),
 (28, 61, 'User', 'Test', 'user@user.com', '01790909090', 'Uttara', 'Dhaka', 18, 6, 41, 320, '2023-06-14 14:19:12', '2023-06-14 20:19:12'),
 (29, 62, 'User', 'Test', 'user@user.com', '01790909090', 'Uttara', 'Dhaka', 18, 6, 41, 320, '2023-06-14 14:23:57', '2023-06-14 20:23:57'),
@@ -1167,7 +1169,17 @@ INSERT INTO `order_billing` (`id`, `order_id`, `name`, `last_name`, `email`, `mo
 (33, 70, 'User', 'Test', 'user@user.com', '01790909090', 'Uttara', 'Dhaka', 18, 6, 41, 320, '2023-06-15 11:29:48', '2023-06-15 17:29:48'),
 (34, 73, 'User', 'Test', 'user@user.com', '01790909090', 'Uttara', 'Dhaka', 18, 6, 41, 320, '2023-06-19 11:23:57', '2023-06-19 17:23:57'),
 (35, 71, 'Organizer', 'Organizer', 'organizer@organizer.com', '1234567890', 'mirpur , Dhaka', 'Mirpur , Dhaka', 18, 6, 41, 320, '2023-06-19 14:04:36', '2023-06-19 20:04:36'),
-(36, 75, 'User', 'Test', 'user@user.com', '01790909090', 'Uttara', 'Dhaka', 18, 6, 41, 320, '2023-12-18 12:13:42', '2023-12-18 18:13:42');
+(36, 75, 'User', 'Test', 'user@user.com', '01790909090', 'Uttara', 'Dhaka', 18, 6, 41, 320, '2023-12-18 12:13:42', '2023-12-18 18:13:42'),
+(37, 76, 'User', 'Test', 'user@user.com', '01790909090', 'Uttara', 'Dhaka', 18, 6, 41, 320, '2023-12-18 12:56:48', '2023-12-18 18:56:48'),
+(38, 79, 'uu', 'test', 'uu@gmail.com', '01798909890', 'uttara', NULL, NULL, NULL, NULL, NULL, '2023-12-20 11:07:30', '2023-12-20 17:07:30'),
+(39, 80, 'okila', 'lkio', 'oklio@gmail.com', '01789876562', 'uttara', NULL, NULL, NULL, NULL, NULL, '2023-12-20 11:42:34', '2023-12-20 17:42:34'),
+(40, 81, 'Abdul', 'Kobir', 'test@gmail.com', '01789876890', 'Uttara', NULL, NULL, NULL, NULL, NULL, '2023-12-20 12:19:17', '2023-12-20 18:19:17'),
+(41, 82, 'Kobir', 'Hossain', 'uuu@gmail.com', '01789987867', 'Uttara', NULL, NULL, NULL, NULL, NULL, '2023-12-20 13:23:56', '2023-12-20 19:23:56'),
+(42, 83, 'Kobir', 'Hossain', 'uuu@gmail.com', '01789987867', 'Uttara', NULL, NULL, NULL, NULL, NULL, '2023-12-20 13:26:07', '2023-12-20 19:26:07'),
+(43, 84, 'sdfsdf', 'sdfsd', 'uuyuy@gmail.com', '01729763242', 'sdfsd', NULL, NULL, NULL, NULL, NULL, '2023-12-20 13:26:59', '2023-12-20 19:26:59'),
+(44, 85, 'My', 'Mail', 'mymail@gmail.com', '01890654323', 'Uttara Dhaka', NULL, NULL, NULL, NULL, NULL, '2023-12-21 11:38:57', '2023-12-21 17:38:57'),
+(45, 86, 'djshf', 'sjkdj', 'weri@gmail.com', '37264783', 'sdjksjk', NULL, NULL, NULL, NULL, NULL, '2023-12-21 11:44:07', '2023-12-21 17:44:07'),
+(46, 87, 'sjkfjs', 'sdbfjsd', 'iterui@gmail.com', '3757834', 'djgsj', NULL, NULL, NULL, NULL, NULL, '2023-12-21 13:12:24', '2023-12-21 19:12:24');
 
 -- --------------------------------------------------------
 
@@ -1200,9 +1212,16 @@ CREATE TABLE `order_head` (
   `event_id` int(10) DEFAULT NULL,
   `total_item` int(10) NOT NULL,
   `order_quantity` int(10) NOT NULL,
+  `sub_total` double(10,2) NOT NULL DEFAULT 0.00,
+  `refer_discount` double(10,2) NOT NULL DEFAULT 0.00,
+  `promo_discount` decimal(10,2) NOT NULL DEFAULT 0.00,
   `total_price` double(10,2) NOT NULL,
   `payment_type` varchar(255) NOT NULL,
   `is_payment` tinyint(1) NOT NULL DEFAULT 0,
+  `tour_date` date DEFAULT NULL,
+  `pick_up_point` varchar(255) DEFAULT NULL,
+  `referer_number` varchar(25) DEFAULT NULL,
+  `transaction_number` varchar(25) DEFAULT NULL,
   `status` varchar(50) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL
@@ -1212,19 +1231,16 @@ CREATE TABLE `order_head` (
 -- Dumping data for table `order_head`
 --
 
-INSERT INTO `order_head` (`id`, `order_id`, `user_id`, `organization_id`, `event_id`, `total_item`, `order_quantity`, `total_price`, `payment_type`, `is_payment`, `status`, `created_at`, `updated_at`) VALUES
-(54, 'ICS-100623-00001', NULL, 2, 16, 3, 3, 6000.00, 'cod', 0, 'Pending', '2023-06-10 13:50:14', '2023-06-10 13:50:14'),
-(57, 'ICS-140623-00002', NULL, 2, 20, 2, 2, 1750.00, 'cod', 0, 'Pending', '2023-06-14 11:23:02', '2023-06-14 11:23:02'),
-(60, 'ICS-140623-00003', 1, NULL, NULL, 2, 2, 3500.00, 'cod', 0, 'Pending', '2023-06-14 14:15:50', '2023-06-14 14:15:50'),
-(61, 'ICS-140623-00004', 1, NULL, NULL, 3, 4, 7500.00, 'cod', 0, 'Pending', '2023-06-14 14:19:11', '2023-06-14 14:19:11'),
-(62, 'ICS-140623-00005', 1, NULL, NULL, 3, 3, 6000.00, 'cod', 0, 'Pending', '2023-06-14 14:23:57', '2023-06-14 14:23:57'),
-(66, 'ICS-140623-00006', 1, NULL, NULL, 3, 3, 6000.00, 'cod', 0, 'Pending', '2023-06-14 14:31:18', '2023-06-14 14:31:18'),
-(67, 'ICS-140623-00007', 1, NULL, NULL, 1, 2, 4000.00, 'cod', 0, 'Pending', '2023-06-14 14:32:13', '2023-06-14 14:32:13'),
-(68, 'ICS-140623-00008', 1, NULL, NULL, 1, 4, 10000.00, 'cod', 0, 'Pending', '2023-06-14 14:33:31', '2023-06-14 14:33:31'),
-(71, 'ICS-150623-00009', NULL, 2, 22, 2, 2, 3500.00, 'cod', 0, 'Pending', '2023-06-15 12:49:16', '2023-06-15 12:49:16'),
-(72, 'ICS-190623-00010', NULL, 2, 23, 1, 1, 2000.00, 'cod', 0, 'Pending', '2023-06-19 11:20:28', '2023-06-19 11:20:28'),
-(73, 'ICS-190623-00011', 1, NULL, NULL, 2, 3, 7000.00, 'cod', 0, 'Pending', '2023-06-19 11:23:57', '2023-06-19 11:23:57'),
-(75, 'ICS-181223-00012', 1, NULL, NULL, 2, 6, 25500.00, 'cod', 0, 'Pending', '2023-12-18 12:13:42', '2023-12-18 12:13:42');
+INSERT INTO `order_head` (`id`, `order_id`, `user_id`, `organization_id`, `event_id`, `total_item`, `order_quantity`, `sub_total`, `refer_discount`, `promo_discount`, `total_price`, `payment_type`, `is_payment`, `tour_date`, `pick_up_point`, `referer_number`, `transaction_number`, `status`, `created_at`, `updated_at`) VALUES
+(79, 'ICS-201223-00014', NULL, NULL, NULL, 2, 5, 9395.00, 800.00, 0.00, 7795.00, 'cod', 0, NULL, NULL, NULL, NULL, 'Pending', '2023-12-20 11:07:30', '2023-12-20 11:07:30'),
+(80, 'ICS-201223-00015', NULL, NULL, NULL, 2, 6, 10794.00, 1000.00, 0.00, 8794.00, 'cod', 0, NULL, NULL, NULL, NULL, 'Pending', '2023-12-20 11:42:34', '2023-12-20 11:42:34'),
+(81, 'ICS-201223-00016', NULL, NULL, NULL, 2, 3, 5697.00, 400.00, 0.00, 4897.00, 'cod', 0, NULL, NULL, NULL, NULL, 'Pending', '2023-12-20 12:19:17', '2023-12-20 12:19:17'),
+(82, 'ICS-201223-00017', NULL, NULL, NULL, 2, 4, 7696.00, 600.00, 0.00, 6496.00, 'cod', 0, '2023-12-21', 'Airport', '01767653423', '47865348683', 'Pending', '2023-12-20 13:23:56', '2023-12-20 13:23:56'),
+(83, 'ICS-201223-00018', NULL, NULL, NULL, 0, 4, 7696.00, 600.00, 0.00, 6496.00, 'cod', 0, '2023-12-21', 'Airport', '01767653423', '47865348683', 'Pending', '2023-12-20 13:26:07', '2023-12-20 13:26:07'),
+(84, 'ICS-201223-00019', NULL, NULL, NULL, 2, 5, 9395.00, 800.00, 0.00, 7795.00, 'cod', 0, '2023-12-15', 'sdfsdf', 'sdfsd', 'sdf233rwe', 'Pending', '2023-12-20 13:26:59', '2023-12-20 13:26:59'),
+(85, 'ICS-211223-00020', NULL, NULL, NULL, 2, 3, 5697.00, 50.00, 0.00, 5247.00, 'cod', 0, '2023-12-21', 'Airport', '01799', '67', 'Pending', '2023-12-21 11:38:57', '2023-12-21 11:38:57'),
+(86, 'ICS-211223-00021', NULL, NULL, NULL, 2, 2, 3698.00, 200.00, 30.00, 3468.00, 'cod', 0, '2023-12-21', 'dskdj', 'dsjkf', 'jasnkdfj', 'Pending', '2023-12-21 11:44:07', '2023-12-21 11:44:07'),
+(87, 'ICS-211223-00022', NULL, NULL, NULL, 2, 3, 5697.00, 400.00, 50.00, 5247.00, 'cod', 0, '2023-12-22', 'jhsdjhfsd', '78878', 'bjhbfsjhjfs', 'Pending', '2023-12-21 13:12:24', '2023-12-21 13:12:24');
 
 -- --------------------------------------------------------
 
@@ -1271,7 +1287,25 @@ INSERT INTO `order_item` (`id`, `order_id`, `item_id`, `item_name`, `item_descri
 (148, 73, 90, 'VIP', 'this is VIP', 5000.00, 1, 2, 12, 15, '2023-06-19 11:23:57', '2023-06-19 11:23:57', 0, 0, 120),
 (149, 73, 89, 'Regular', 'this is regular', 2000.00, 1, 1, 12, 15, '2023-06-19 11:23:57', '2023-06-19 11:23:57', 0, 0, 119),
 (150, 75, 93, 'Adult', NULL, 15000.00, 1, 3, NULL, 1, '2023-12-18 12:13:42', '2023-12-18 12:13:42', 0, 0, NULL),
-(151, 75, 94, 'Child', NULL, 10500.00, 1, 3, NULL, 1, '2023-12-18 12:13:42', '2023-12-18 12:13:42', 0, 0, NULL);
+(151, 75, 94, 'Child', NULL, 10500.00, 1, 3, NULL, 1, '2023-12-18 12:13:42', '2023-12-18 12:13:42', 0, 0, NULL),
+(152, 76, 93, 'Adult', NULL, 15000.00, 1, 3, NULL, 1, '2023-12-18 12:56:48', '2023-12-18 12:56:48', 0, 0, NULL),
+(153, 76, 94, 'Child', NULL, 7000.00, 1, 2, NULL, 1, '2023-12-18 12:56:48', '2023-12-18 12:56:48', 0, 0, NULL),
+(156, 79, 93, 'Adult', NULL, 5997.00, NULL, 3, NULL, 1, '2023-12-20 11:07:30', '2023-12-20 11:07:30', 0, 0, NULL),
+(157, 79, 94, 'Child', NULL, 3398.00, NULL, 2, NULL, 1, '2023-12-20 11:07:30', '2023-12-20 11:07:30', 0, 0, NULL),
+(158, 80, 93, 'Adult', NULL, 3998.00, NULL, 2, NULL, 1, '2023-12-20 11:42:34', '2023-12-20 11:42:34', 0, 0, NULL),
+(159, 80, 94, 'Child', NULL, 6796.00, NULL, 4, NULL, 1, '2023-12-20 11:42:34', '2023-12-20 11:42:34', 0, 0, NULL),
+(160, 81, 93, 'Adult', NULL, 3998.00, NULL, 2, NULL, 1, '2023-12-20 12:19:17', '2023-12-20 12:19:17', 0, 0, NULL),
+(161, 81, 94, 'Child', NULL, 1699.00, NULL, 1, NULL, 1, '2023-12-20 12:19:17', '2023-12-20 12:19:17', 0, 0, NULL),
+(162, 82, 93, 'Adult', NULL, 5997.00, NULL, 3, NULL, 1, '2023-12-20 13:23:56', '2023-12-20 13:23:56', 0, 0, NULL),
+(163, 82, 94, 'Child', NULL, 1699.00, NULL, 1, NULL, 1, '2023-12-20 13:23:56', '2023-12-20 13:23:56', 0, 0, NULL),
+(164, 84, 93, 'Adult', NULL, 5997.00, NULL, 3, NULL, 1, '2023-12-20 13:26:59', '2023-12-20 13:26:59', 0, 0, NULL),
+(165, 84, 94, 'Child', NULL, 3398.00, NULL, 2, NULL, 1, '2023-12-20 13:26:59', '2023-12-20 13:26:59', 0, 0, NULL),
+(166, 85, 93, 'Adult', NULL, 3998.00, NULL, 2, NULL, 1, '2023-12-21 11:38:57', '2023-12-21 11:38:57', 0, 0, NULL),
+(167, 85, 94, 'Child', NULL, 1699.00, NULL, 1, NULL, 1, '2023-12-21 11:38:57', '2023-12-21 11:38:57', 0, 0, NULL),
+(168, 86, 93, 'Adult', NULL, 1999.00, NULL, 1, NULL, 1, '2023-12-21 11:44:07', '2023-12-21 11:44:07', 0, 0, NULL),
+(169, 86, 94, 'Child', NULL, 1699.00, NULL, 1, NULL, 1, '2023-12-21 11:44:07', '2023-12-21 11:44:07', 0, 0, NULL),
+(170, 87, 93, 'Adult', NULL, 3998.00, NULL, 2, NULL, 1, '2023-12-21 13:12:24', '2023-12-21 13:12:24', 0, 0, NULL),
+(171, 87, 94, 'Child', NULL, 1699.00, NULL, 1, NULL, 1, '2023-12-21 13:12:24', '2023-12-21 13:12:24', 0, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -1446,6 +1480,29 @@ INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at
 (74, 'order_edit', 'web', '2023-03-20 19:20:23', NULL),
 (75, 'order_view', 'web', '2023-03-20 19:20:23', NULL),
 (76, 'order_delete', 'web', '2023-03-20 19:20:23', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `promo_code`
+--
+
+CREATE TABLE `promo_code` (
+  `id` int(10) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `promo_code` varchar(20) NOT NULL DEFAULT 'sharentip',
+  `amount` decimal(10,2) DEFAULT 0.00,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf16 COLLATE=utf16_general_ci;
+
+--
+-- Dumping data for table `promo_code`
+--
+
+INSERT INTO `promo_code` (`id`, `name`, `promo_code`, `amount`, `created_at`, `updated_at`) VALUES
+(1, 'Special Discount', 'SPD0001', 50.00, '2023-12-21 16:26:51', NULL),
+(2, 'General Discount', 'GED0001', 30.00, '2023-12-21 16:27:20', NULL);
 
 -- --------------------------------------------------------
 
@@ -1649,8 +1706,8 @@ INSERT INTO `service_item` (`id`, `service_id`, `service_category_id`, `item_nam
 (88, 15, 12, '1st class', 'this is first class', '1', 1500.00, '1', '2023-06-10 12:54:27', '2023-06-10 12:54:27'),
 (89, 15, 12, 'Regular', 'this is regular', '1', 2000.00, '2', '2023-06-10 12:54:27', '2023-06-10 12:54:27'),
 (90, 15, 12, 'VIP', 'this is VIP', '1', 2500.00, '3', '2023-06-10 12:54:27', '2023-06-10 12:54:27'),
-(93, 16, 1, 'Adult', 'Adult', '1', 5000.00, '4%', '2023-12-18 10:20:53', '2023-12-18 10:20:53'),
-(94, 16, 1, 'Child', 'Adult', '1', 3500.00, '3%', '2023-12-18 10:20:53', '2023-12-18 10:20:53');
+(93, 16, 1, 'Adult', 'Adult', '1', 1999.00, '4%', '2023-12-18 10:20:53', '2023-12-18 10:20:53'),
+(94, 16, 1, 'Child', 'Adult', '1', 1699.00, '3%', '2023-12-18 10:20:53', '2023-12-18 10:20:53');
 
 -- --------------------------------------------------------
 
@@ -7398,7 +7455,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `first_name`, `last_name`, `email`, `email_verified_at`, `password`, `remember_token`, `device_token`, `image`, `phone`, `bio`, `org_id`, `status`, `language`, `created_at`, `updated_at`, `address1`, `address2`, `country`, `division`, `district`, `upazila`) VALUES
-(1, 'Super Admin', 'Super', 'Admin', 'admin@admin.com', NULL, '$2y$10$l84Xfp4x8hyNPwK.RqBzRuNbItCJXf7FRzHoJ.WU/VIwLQY4rNDuu', 'qpCzCDS4D54ty9ec43kmAWAv23eG5NKkyXaix5nQoWpoOp3uIo2Cgnse0dnl', NULL, 'defaultuser.png', NULL, NULL, NULL, 1, 'English', '2021-10-04 03:51:50', '2021-10-04 04:45:52', NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Super Admin', 'Super', 'Admin', 'admin@admin.com', NULL, '$2y$10$l84Xfp4x8hyNPwK.RqBzRuNbItCJXf7FRzHoJ.WU/VIwLQY4rNDuu', 'h91mwId4Fry32o5MN572oGoSBgsu5Lr5ASGFSoRKddWcG0Fd2yp3vcO4M7T9', NULL, 'defaultuser.png', '78878', NULL, NULL, 1, 'English', '2021-10-04 03:51:50', '2021-10-04 04:45:52', NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 'Organizer', 'Organizer', 'Organizer', 'organizer@organizer.com', NULL, '$2y$10$GXw/LnMnsf2LOth0QX7hp.I7YqVziAsQ2CkBErIX7NaA8nNfM7VrS', 'rFEPjU6FSOFL1r9MppefvApNwGX2XIkZtX1yx33WERMItXIXnzyffGYhiMMM', NULL, 'defaultuser.png', '1234567890', NULL, NULL, 1, 'English', '2021-10-03 23:08:32', '2021-10-04 04:48:20', 'mirpur , Dhaka', 'Mirpur , Dhaka', 18, 6, 41, 320),
 (3, NULL, 'AA', 'BB', 'adminfaruk@admin.com', NULL, '$2y$10$vW2dEgzjb78esH073s7d5u2fgLIeoB0UBIWXctdQq7op/z//h7d9y', NULL, NULL, 'defaultuser.png', '9999999999', NULL, 2, 1, 'English', '2023-03-10 03:44:00', '2023-03-10 03:44:00', NULL, NULL, NULL, NULL, NULL, NULL),
 (4, 'Rashedul Raju', NULL, NULL, 'rbraju3m@gmail.com', NULL, '$2y$10$x1IyXQsnvRrNoh0o6ohU2O6CD5dW6ejt8zDz.UIh4Ase4jPFqfYce', 'cFkpFKL1BBodm5WrlusIzahDCRGEiS3h1eD6Dmkuwzd5xVtDtJ8Sp8zfGxyv', NULL, 'defaultuser.png', NULL, NULL, NULL, 1, NULL, '2023-03-16 13:13:55', '2023-03-16 13:13:55', NULL, NULL, NULL, NULL, NULL, NULL);
@@ -7638,6 +7695,13 @@ ALTER TABLE `permissions`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `promo_code`
+--
+ALTER TABLE `promo_code`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `promo_code` (`promo_code`);
+
+--
 -- Indexes for table `review`
 --
 ALTER TABLE `review`
@@ -7733,7 +7797,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `app_user`
 --
 ALTER TABLE `app_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `banner`
@@ -7871,7 +7935,7 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT for table `order_billing`
 --
 ALTER TABLE `order_billing`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `order_child`
@@ -7883,13 +7947,13 @@ ALTER TABLE `order_child`
 -- AUTO_INCREMENT for table `order_head`
 --
 ALTER TABLE `order_head`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT for table `order_item`
 --
 ALTER TABLE `order_item`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=172;
 
 --
 -- AUTO_INCREMENT for table `order_status`
@@ -7914,6 +7978,12 @@ ALTER TABLE `payment_setting`
 --
 ALTER TABLE `permissions`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+
+--
+-- AUTO_INCREMENT for table `promo_code`
+--
+ALTER TABLE `promo_code`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `review`

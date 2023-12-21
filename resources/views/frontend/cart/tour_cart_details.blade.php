@@ -49,7 +49,7 @@
                                                     <div class="d-flex justify-content-between align-items-center mb-5">
                                                         <h1 class="fw-bold mb-0 text-black">Item Cart</h1>
                                                         <h6 class="mb-0 text-muted">{{count($cart_items)>0?count($cart_items):0}}
-                                                            items</h6>
+                                                            - Persons</h6>
                                                     </div>
 
 
@@ -165,7 +165,7 @@
 
                                                     <div class="d-flex justify-content-between mb-4">
                                                         <h5 style="font-size: 15px !important;" class="text-uppercase QUANTITYITEMS">
-                                                            items {{count($cart_items)>0?count($cart_items):0}}</h5>
+                                                            Total Person {{count($cart_items)>0?count($cart_items):0}}</h5>
                                                         <h5 style="font-size: 15px !important;"  class="total-amount-tk">
                                                             TK. {{number_format($totalPrice,2)}}
                                                             <input type="hidden" name="total_price" value="{{$totalPrice}}">
@@ -336,7 +336,7 @@
                     $('#quantity_value_'+itemId).val(response.order_quantity);
                     $('.subtotal_'+itemId).text(response.subtotal);
                     $('.total-quantity').text(response.total_order_qty);
-                    $('.QUANTITYITEMS').text(' items '+response.total_order_qty);
+                    $('.QUANTITYITEMS').text(' Total Person '+response.total_order_qty);
                     $('.total-amount').text(response.total_amount);
                     $('.refer-discount').text('TK. '+response.refer_discount);
                     $('.total-amount-tk').text('TK. '+response.total_amount);

@@ -53,6 +53,12 @@ use Artesaos\SEOTools\Facades\JsonLd;
 
 class FrontendController extends Controller
 {
+    public function refHome($slug){
+        $id = substr($slug, 3, -3);
+        $refUser = User::find($id);
+        Session::put('refUser', $refUser->phone);
+        return redirect()->route('home');
+    }
     public function home(){
         if(env('DB_DATABASE')==null){
             return view('admin.frontpage');

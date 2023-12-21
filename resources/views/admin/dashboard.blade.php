@@ -3,7 +3,9 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>{{ __('Dashboard') }} </h1>
+            <h1>{{ __('Dashboard') }}
+                <span style="font-size: 12px;color: red">{{'http://localhost/sharentip/public/ref/'.mt_rand(100,999).auth()->user()->id.mt_rand(100,999)}}</span>
+            </h1>
         </div>
 
         <div class="section-body">
@@ -96,7 +98,7 @@
                                     <div class="vector-map" id="eventMap"></div>
                                 </div>
                             </div> --}}
-                            
+
                         </div>
                         <div class="col-lg-12">
                             <div class="card mb-4">
