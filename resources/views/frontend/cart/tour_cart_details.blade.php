@@ -184,6 +184,20 @@
 
                                                     <hr class="my-4">
 
+                                                    <div class="d-flex justify-content-between mb-4">
+                                                        <h5 style="font-size: 15px !important;width: 60%" class="text-uppercase ">
+                                                            <a data-href="{{route('get_promo_discount')}}" id="get_promo_discount"></a>
+                                                            <input type="text" name="promo_code" id="promo_code" class="form-control" placeholder="Promo Code">
+                                                        </h5>
+                                                        <h5 style="font-size: 15px !important;"  class="promo-discount">
+{{--                                                            TK. {{number_format(0,2)}}--}}
+                                                            TK. 0.00
+{{--                                                            <input type="hidden" name="refer_discount" value="{{0}}">--}}
+                                                        </h5>
+                                                    </div>
+
+                                                    <hr class="my-4">
+
                                                     <div class="d-flex justify-content-between mb-5">
                                                         <h5 class="text-uppercase" style="font-size: 15px !important;">Total price</h5>
                                                         <h5 style="font-size: 15px !important;" class="total_amount_without_refer">
@@ -256,14 +270,25 @@
 
     @push('EveryPageCustomJS')
         <script>
-            /*$(document).on('click', '.payment_method', function (e) {
-                let paymentMethod = $(this).val();
-                if (paymentMethod === 'LOCAL') {
-                    $('.register_button').removeAttr("disabled");
-                } else {
-                    $('.register_button').attr('disabled', 'disabled');
-                }
-            });*/
+            $(document).on('keyup', '#promo_code', function (e) {
+                let promoCode = $(this).val();
+                let url = jQuery('#get_promo_discount').attr('data-href');
+                jQuery.ajax({
+                    url: url,
+                    method: "get",
+                    data: {promoCode:promoCode},
+                    dataType: "json",
+                    beforeSend: function (xhr) {
+
+                    }
+                }).done(function( response ) {
+                    $('.promo-discount').text('TK. '+response.promoDiscount);
+                    $('.total_amount_without_refer').text('TK. '+response.totalAmount);
+                }).fail(function( jqXHR, textStatus ) {
+
+                });
+                return false;
+            });
 
             $(document).delegate(".input_value",'change',function(e) {
                 let itemId = jQuery(this).attr('item-id');
@@ -279,6 +304,7 @@
                 e.preventDefault();
                 let itemId = jQuery(this).attr('item-id');
                 let buttonStatus = jQuery(this).attr('button-status');
+                let promoCode = jQuery('#promo_code').val();
 
                 let orderQuantity = jQuery('#quantity_value_'+itemId).val();
                 orderQuantity = parseInt(orderQuantity);
@@ -293,21 +319,20 @@
                         orderQuantity = 1;
                     }
                 }
-                ajaxCall(orderQuantity,itemId)
+                ajaxCall(orderQuantity,itemId,promoCode)
             });
 
-            function ajaxCall(orderQuantity,itemId) {
+            function ajaxCall(orderQuantity,itemId,promoCode) {
                 let url = jQuery('#cart_update').attr('data-href');
                 jQuery.ajax({
                     url: url,
                     method: "get",
-                    data: {itemId:itemId,orderQuantity:orderQuantity},
+                    data: {itemId:itemId,orderQuantity:orderQuantity,promoCode:promoCode},
                     dataType: "json",
                     beforeSend: function (xhr) {
 
                     }
                 }).done(function( response ) {
-                    console.log(response)
                     $('#quantity_value_'+itemId).val(response.order_quantity);
                     $('.subtotal_'+itemId).text(response.subtotal);
                     $('.total-quantity').text(response.total_order_qty);
@@ -316,6 +341,7 @@
                     $('.refer-discount').text('TK. '+response.refer_discount);
                     $('.total-amount-tk').text('TK. '+response.total_amount);
                     $('.total_amount_without_refer').text('TK. '+response.total_amount_without_refer);
+                    $('.promo-discount').text('TK. '+response.promoDiscount);
                 }).fail(function( jqXHR, textStatus ) {
 
                 });

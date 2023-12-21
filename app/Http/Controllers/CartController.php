@@ -169,6 +169,7 @@ class CartController extends Controller
     public function itemUpdateIntoCart(){
         $itemId = $_GET['itemId'];
         $orderQuantity = $_GET['orderQuantity'];
+        $promoCode = $_GET['promoCode'];
 
         $items['item_id'] = $itemId;
         $items['order_quantity'] = $orderQuantity;
@@ -192,7 +193,15 @@ class CartController extends Controller
         $response['refer_discount'] = number_format($referDiscount,2);
         $response['total_amount'] = number_format($totalAmount,2);
         $response['total_amount_without_refer'] = number_format($totalAmount-$referDiscount,2);
-//        dd($response);
+        $response['promoDiscount'] = 0;
+        if ($promoCode){
+            $promoDiscountData = DB::table('promo_code')->where('promo_code',$promoCode)->first();
+            if ($totalOrderQty >= 1){
+                $promoDiscount = $promoDiscountData && $promoDiscountData->amount?$promoDiscountData->amount:0;
+                $response['total_amount_without_refer'] = number_format($totalAmount-($promoDiscount+$referDiscount),2);
+                $response['promoDiscount'] = $promoDiscount;
+            }
+        }
         return $response;
     }
 
@@ -216,6 +225,7 @@ class CartController extends Controller
 
     public function orderPlaceNext(Request $request){
         $data = $request->all();
+//        dd($data);
         $data['message'] = 'next';
         $cartItems = Session::get('cart');
         $subTotal = 0;
@@ -230,18 +240,60 @@ class CartController extends Controller
         if ($totalQuantity>1){
             $referDiscount = ($totalQuantity-1)*200;
             $totalAmount = $totalAmount-$referDiscount;
-            $totalAmount = $totalAmount-(($totalQuantity-1)*200);
         }
         $data['totalQuantity'] = $totalQuantity;
         $data['referDiscount'] = $referDiscount;
         $data['subTotal'] = number_format($subTotal,2);
         $data['totalAmount'] = number_format($totalAmount,2);
         $data['payment_type'] = 'LOCAL';
+        if ($data['promo_code']){
+            $promoDiscountData = DB::table('promo_code')->where('promo_code',$data['promo_code'])->first();
+            if ($totalQuantity >= 1){
+                $promoDiscount = $promoDiscountData && $promoDiscountData->amount?$promoDiscountData->amount:0;
+                $data['totalAmount'] = number_format($totalAmount-($promoDiscount),2);
+                $data['promoDiscount'] = $promoDiscount;
+            }
+        }
         return view('frontend.cart.tour_cart_details_billing',compact('data','cartItems'));
     }
 
     public function onlinePayment(){
         return view('frontend.cart.online_payment');
+    }
+
+    public function getPromoDiscount(){
+        $promoCode = $_GET['promoCode'];
+        $promoDiscountData = DB::table('promo_code')->where('promo_code',$promoCode)->first();
+        $cartItems = Session::get('cart');
+        $subTotal = 0;
+        $totalAmount = 0;
+        $totalQuantity = 0;
+        $referDiscount = 0;
+        $promoDiscount = 0;
+        $data = [];
+
+//        dd($promoDiscountData->amount);
+        if ($cartItems) {
+            foreach ($cartItems as $item) {
+                $subTotal = $subTotal + $item['subtotal'];
+                $totalAmount = $subTotal;
+                $totalQuantity = $totalQuantity + $item['order_quantity'];
+            }
+            if ($totalQuantity > 1) {
+                $referDiscount = ($totalQuantity - 1) * 200;
+                $totalAmount = $totalAmount - $referDiscount;
+            }
+            if ($totalQuantity >= 1){
+                $promoDiscount = $promoDiscountData->amount?$promoDiscountData->amount:0;
+                $totalAmount = $totalAmount - $promoDiscount;
+            }
+            $data['totalQuantity'] = $totalQuantity;
+            $data['referDiscount'] = $referDiscount;
+            $data['promoDiscount'] = $promoDiscount;
+            $data['subTotal'] = number_format($subTotal, 2);
+            $data['totalAmount'] = number_format($totalAmount, 2);
+        }
+        return $data;
     }
 
     public function orderPlace(Request $request){
@@ -278,11 +330,12 @@ class CartController extends Controller
         $orderInput['transaction_number'] = $input['transaction_number'];
         $orderInput['order_quantity'] = $input['totalQuantity'];
         $orderInput['sub_total'] = str_replace( ',', '', $input['subTotal'] );
-        $orderInput['refer_discount'] = str_replace( ',', '', $input['referDiscount'] );
+        $orderInput['refer_discount'] = str_replace( ',', '', isset($input['referDiscount'])?$input['referDiscount']:0 );
+        $orderInput['promo_discount'] = str_replace( ',', '', isset($input['promoDiscount'])?$input['promoDiscount']:0 );
         $orderInput['total_price'] = str_replace( ',', '', $input['totalAmount'] );
         $orderInput['status'] = 'Pending';
 
-//        dd($cartItems);
+//        dd($orderInput);
 
         DB::beginTransaction();
         try {
@@ -311,19 +364,6 @@ class CartController extends Controller
                     $orderItem->service_id = $item['service_id'];
                     $orderItem->order_item_id = isset($item['order_item_id']) && $item['order_item_id'] ? $item['order_item_id']:null;
 
-                    /*if (isset($item['order_item_id']) && $item['order_item_id'] != null){
-                        $mainOrderItem = OrderItem::find($item['order_item_id']);
-                        $getOrder = OrderHead::find($mainOrderItem->order_id);
-                        $getEvent = Event::find($getOrder->event_id);
-                        $totalSold = $getEvent->sold+$item['order_quantity'];
-                        $soldTicket = OrderItem::where('order_item_id',$item['order_item_id'])->sum('order_quantity');
-                        $mainOrderItem->update([
-                            'sold' => $soldTicket+$item['order_quantity']
-                        ]);
-                        $getEvent->update([
-                            'sold' => $totalSold
-                        ]);
-                    }*/
                     $orderHead->OrderItem()->save($orderItem);
                     CartHelper::remove_item($item['item_id']);
                 }

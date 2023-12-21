@@ -10,7 +10,7 @@ class OrderHead extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'order_id', 'user_id', 'organization_id', 'event_id', 'total_item', 'order_quantity', 'total_price', 'payment_type', 'is_payment', 'status','refer_discount','sub_total','tour_date','pick_up_point','referer_number','transaction_number'
+        'order_id', 'user_id', 'organization_id', 'event_id', 'total_item', 'order_quantity', 'total_price', 'payment_type', 'is_payment', 'status','refer_discount','sub_total','tour_date','pick_up_point','referer_number','transaction_number','promo_discount'
     ];
 
     protected $table = 'order_head';

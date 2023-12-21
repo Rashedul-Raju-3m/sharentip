@@ -52,6 +52,7 @@ Route::get('/service/category/details/{id}/{name}', [FrontendController::class, 
     Route::POST('/order/place', [CartController::class, 'orderPlace'])->name('order_place');
     Route::POST('/order/place/next', [CartController::class, 'orderPlaceNext'])->name('order_place_next');
     Route::POST('/order-place/billing', [CartController::class, 'orderPlaceBilling'])->name('tour_cart_page_billing');
+    Route::get('get-promo-discount', [CartController::class, 'getPromoDiscount'])->name('get_promo_discount');
 
 
 Route::group(['middleware' =>'appuser'], function () {

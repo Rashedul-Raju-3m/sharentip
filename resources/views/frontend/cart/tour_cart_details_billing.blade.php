@@ -195,6 +195,15 @@
                                                         <input type="hidden" name="referDiscount" value="{{$data['referDiscount']}}">
                                                     </div>
 
+                                                    @if(isset($data['promoDiscount']) && $data['promoDiscount']>0)
+
+                                                    <div class="d-flex justify-content-between mb-4">
+                                                        <h5 style="font-size: 15px !important;" class="text-uppercase">Promo Discount</h5>
+                                                        <h5 style="font-size: 15px !important;"  class="total-amount-tk">{{number_format($data['promoDiscount'],2)}}</h5>
+                                                        <input type="hidden" name="promoDiscount" value="{{$data['promoDiscount']}}">
+                                                    </div>
+                                                    @endif
+
                                                     <hr class="my-4">
 
                                                     <div class="d-flex justify-content-between mb-5">
